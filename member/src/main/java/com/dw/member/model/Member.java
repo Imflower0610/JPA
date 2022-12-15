@@ -21,13 +21,15 @@ public class Member {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column
 	private long id;
-	@Column
+	@Column(length = 30)
 	private String name;
 	@Column
 	private int age;
-//	@Column(name="dept_id")
-//	private int deptId;
-//	
+	@Column(length = 40)
+	private String userId;
+	@Column
+	private String userPassword;
+
 	// @JoinColumn => member테이블에 dept_id라는 컬럼(fk)생성
 	@ManyToOne
 	@JoinColumn(name="dept_id")

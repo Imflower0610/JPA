@@ -11,4 +11,8 @@ public class PageController {
 		return "member";
 	}
 	
+	@GetMapping("/login")
+	public String callloginpage() {
+		return "login";
+	}
 }
