@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<style type="text/css">
+body {
+	text-align: center;
+}
+
+h2 {
+	text-align: center;
+}
+
+table {
+	font-family: arial, sans-serif;
+	border-collapse: collapse;
+	width: 100%;
+}
+
+td, th {
+	border: 1px solid #dddddd;
+	text-align: center;
+	padding: 8px;
+}
+
+tr:nth-child(even) {
+	background-color: lightgrey;
+}
+
+tr:hover {
+	cursor: pointer;
+	
+}
+
+
+</style>
+</head>
+<body>
+	<h3>DW 페이지 입니당</h3>
+	<h3>사원 정보</h3>
+	<div>
+		<input id="id" type="text" disabled="disabled" placeholder="사용자 ID">
+		<input id="age" type="text" disabled="disabled" placeholder="사용자 나이">
+		<input id="name" type="text" disabled="disabled" placeholder="사용자 이름">
+		<input id="dname" type="text" disabled="disabled" placeholder="부서 이름">
+	</div>
+	<!-- 사용자 추가 -->
+	<div>
+	<h5>사용자 추가</h5>
+	<input id="i_age" type="text" placeholder="사용자 나이">
+	<input id="i_name" type="text" placeholder="사용자 이름">
+	<input id="i_dept_id" type="text" placeholder="부서 번호">
+	<button onclick="doInsert()" type="button">추가</button>
+	</div>
+	<!-- 삭제 -->
+	<div>
+	<h5>사용자 삭제</h5>
+		<input id="d_id" type="text" placeholder="사용자 ID">
+		<button onclick="doDelete()" type="button">삭제</button>
+	</div>
+	<!-- 수정 -->
+	<div>
+	<h5>사용자 수정</h5>
+		<input id="u_id" type="text" placeholder="사용자 ID"> <input
+			id="u_age" type="text" placeholder="사용자 나이"> <input
+			id="u_name" type="text" placeholder="사용자 이름">
+			<input id="u_dept_id" type="text" placeholder="부서 번호">
+		<button onclick="doUpdate()" type="button">수정</button>
+	</div>
+
+	<!-- 사원목록 구현하기 -->
+<h5>사용자 목록</h5>
+	<div id="data"></div>
+</body>
+<script src="https://code.jquery.com/jquery-3.6.1.js"
+	integrity="sha256-3zlB5s2uwoUzrXK3BT7AX3FyvojsraNFxCc2vC/7pNI="
+	crossorigin="anonymous"></script>
+<script type="text/javascript">
+//목록불러오기
+	function doSubmit() {
+		//AJAX 호출
+		$
+				.ajax({
+					url : 'api/v1/member',
+					contentType : 'application/json',//서버에 json타입으로 보낼 예정(요청)
+					type : 'GET',
+					dataType : 'json',
+					success : function(response) {
+						console.log(response)
+						var table = "<table align = center><th>ID</th><th>AGE</th><th>NAME</th><th>DNAME</th> ";
+						for ( var i in response) {
+							table += "<tr onclick='getMember(" + response[i].id
+									+ ")'><td>" + response[i].id + "</td><td>"
+									+ response[i].age + "</td><td>"
+									+ response[i].name + "</td><td>"
+									+ response[i].dept.dname + "</td></tr>"
+						}
+						table += "</table>"
+						$("#data").append(table);
+					}
+				})
+	}
+	doSubmit()
+//상세페이지
+	function getMember(id) {
+		$.ajax({
+			url : 'api/v1/member/' + id,
+			contentType : 'application/json',//서버에 json타입으로 보낼 예정(요청)
+			type : 'GET',
+			dataType : 'json',
+			success : function(response) {
+				$("#id").val(response.id)
+				$("#age").val(response.age)
+				$("#name").val(response.name)
+				$("#dname").val(response.dept.dname)
+			}
+		})
+	}
+//추가
+	function doInsert() {
+		var age = $("#i_age").val();
+		var name = $("#i_name").val();
+		var dept_id =$("#i_dept_id").val();
+		
+		var jsonData = {
+			"age" : age,
+			"name" : name,
+			"dept_id":dept_id
+		};
+		//AJAX 호출
+		$.ajax({
+			url : 'api/v1/member',
+			contentType : 'application/json',//서버에 json타입으로 보낼 예정(요청)
+			type : 'POST',
+			data : JSON.stringify(jsonData),
+			dataType : 'json',
+			success : function(response) {
+				console.log(response)
+				alert("추가완료")
+				location.reload();//강제새로고침
+			}
+		});
+	}
+//삭제
+	function doDelete() {
+		var id = $("#d_id").val();
+		if (id == "") {
+			alert("아이디를 입력해주세요")
+			$("#d_id").focus();
+			return false;
+		}
+
+		//사원삭제
+		$.ajax({
+			url : "api/v1/member/" + id,
+			type : 'DELETE',
+			dataType : 'json',
+			success : function(response) {
+				console.log(response)
+				alert("삭제완료")
+				location.reload();//강제새로고침
+			}
+		});
+	}
+//수정
+	function doUpdate() {
+		var id = $("#u_empno").val();
+		var age = $('#u_ename').val();
+		var name = $("#u_job").val();
+		var dept_id =$("#u_dept_id").val();
+
+		var jsonData = {
+			"id" : id,
+			"age" : age,
+			"name" : name,
+			"dept_id" :dept_id
+		};
+		$.ajax({
+			url : 'api/v1/member',
+			type : 'PATCH',
+			contentType : 'application/json',//서버에 json타입으로 보낼 예정(요청)
+			data : JSON.stringify(jsonData),
+			dataType : 'json',
+			success : function(response) {
+				console.log(response);
+				alert("수정완료");
+				location.reload();//강제새로고침
+			}
+		});
+	}
+</script>
+</html>
