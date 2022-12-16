@@ -29,7 +29,7 @@ public class MemberController {
 		Member m = repo.findByuserIdAndUserPassword(member.getUserId(), member.getUserPassword());
 		if (m != null) {
 			HttpSession session = request.getSession();
-			session.setAttribute( "userId",m.getUserId());
+			session.setAttribute( "userId",member.getUserId());
 			return true;
 		}
 		else {
